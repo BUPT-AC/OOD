@@ -48,3 +48,48 @@ public:
 	virtual int score();
 	void addCard(Card c);
 };
+
+class Gamer
+{
+protected:
+	Strategy strategy;
+	vector<Hand> hands;
+	string name;
+	double money;
+public:
+	Gamer(arguments);
+	~Gamer();
+	int GetScore();
+	void MakeDecision()''
+	/* data */
+};
+
+class Player: public Gamer
+{
+private:
+	// costom data
+	vector<Action> actions;
+public:
+	Player(arguments);
+	~Player();
+
+	/* data */
+};
+
+class Dealer: public Gamer
+{
+private:
+	Deck deck;
+	// game information
+public:
+	Dealer(arguments);
+	~Dealer();
+
+	/* data */
+};
+
+struct Action
+{
+	string info;
+	date time;
+};

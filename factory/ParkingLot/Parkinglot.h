@@ -13,14 +13,15 @@
 
 #include <stdio.h>
 class ParkingSpot;
-
+class Ticket;
 enum VehicleSize { Moto, Compact, Large};
 
 class Vehicle {
 protected:
+    int Id;
     ParkingSpot* parkingSpot = nullptr;
     VehicleSize size;
-    
+    Ticket * ticket;
 public:
     VehicleSize getSize() {return size;}
     void parkInSpot(ParkingSpot* s){
@@ -32,7 +33,7 @@ public:
             parkingSpot = nullptr;
         }
     }
-    bool canFitInSpot(ParkingSpot * spot) ;
+    virtual bool canFitInSpot(ParkingSpot * spot) ;
 };
 
 class Bus : public Vehicle {
@@ -59,6 +60,17 @@ public:
         size = VehicleSize::Moto;
     }
     bool canFitInSpot(ParkingSpot * spot);
+};
+
+class Ticket
+{
+public:
+    Vehicle * v;
+    Parkinglot * p;
+    int startTime, endTime;
+public:
+    Ticket(arguments);
+    ~Ticket();
 };
 
 
