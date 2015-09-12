@@ -1,5 +1,7 @@
 from page_crawler import page_crawler
 from threading import BoundedSemaphore, Thread
+import splite3 as lite
+import sys
 
 class task:
 	"""docstring for task"""
@@ -39,7 +41,7 @@ class TaskQueue:
 
 class Crawler(Thread):
 	"""docstring for Crawler"""
-	def __init__(self, taskQueue, TaskLock, PageQueue, PageLock, event, output):
+	def __init__(self, taskQueue, TaskLock, PageQueue, PageLock, event, db):
 		# super(Thread,self).__init__(self)
 		Thread.__init__(self)
 		self.TaskQueue = taskQueue
@@ -51,7 +53,18 @@ class Crawler(Thread):
 		self.crawler = page_crawler()
 		self.doneTask = TaskQueue(None)
 		self.donePage = TaskQueue(None)
-		self.output = output
+		self.db = db
+		try:
+			self.cur = self.db.cursor()
+			self.cur.executescript("""
+						CREATE TABLE PAGE((ID INT PRIMARY KEY, URL TEXT, CONTENT TEXT) IF NOT EXISTS PAGE;
+						CREATE INDEX URLIDX ON PAGE(URL);
+						""");
+			self.db.commit()
+		except lite.Error, e:
+			if self.db:
+				self.db.rollback()
+				sys.exit(1)
 
 	def run(self):
 		while True:
@@ -66,10 +79,11 @@ class Crawler(Thread):
 						self.TaskQueue.add(newTask)
 					task.state = "done"
 					self.doneTask.add(task)
-			else:
+			elif page:
 				with self.PageLock:
 					self.PageQueue.add(page)
-					self.output.write(page)
+					self.cur.execute('insert into PAGE(URL, CONTENT) VALUES(:URL, :CONTENT)',{"URL": task.url, "CONTENT":page})
+					self.db.commit
 				with self.TaskLock:
 					task.state = "done"
 					self.doneTask.add(task)

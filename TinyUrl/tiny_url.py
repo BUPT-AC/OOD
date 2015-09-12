@@ -20,6 +20,7 @@ class Shortener():
 		"""
 		type host: str
 		type r : bool --> whether use random generator to generate shortenedURL
+		type useDB: bool --> whether use db to store data
 		"""
 		if len(self.charPool) == 0:
 			for c in xrange(ord('0'), ord('9')+1):

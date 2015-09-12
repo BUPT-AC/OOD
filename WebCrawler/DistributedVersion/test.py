@@ -1,6 +1,9 @@
-from crawler import task, TaskQueue, Crawler
-from threading import Event, BoundedSemaphore
-
+import sys
+sys.path.append('../')
+from crawler import task, TaskQueue 
+from Connector import Connector
+from Crawler import Crawler
+from threading import BoundedSemaphore, Event
 
 def main():
 	t1 = task("http://www.laurentluce.com/posts/python-threads-synchronization-locks-rlocks-semaphores-conditions-events-and-queues/")
@@ -15,15 +18,26 @@ def main():
 
 	taskLock = BoundedSemaphore(tasks.numOfNewTasks)
 	pageLock = BoundedSemaphore(1)
+	f = open("test.txt",'w')
+	Connector0 = Connector(tasks,taskLock,pages,pageLock,event,'',f, 3000)
+	Connector1 = Connector(tasks,taskLock,pages,pageLock,event,'',f, 3001)
+	Connector0.start()
+	Connector1.start()
 
-	f = open("test.txt",'a')
+	Crawler0 = Crawler('',3000)
+	Crawler1 = Crawler('',3001)
 
-	Crawler1 = Crawler(tasks,taskLock,pages,pageLock,event,f)
-	Crawler2 = Crawler(tasks,taskLock,pages,pageLock,event,f)
+	Crawler0.start()
 	Crawler1.start()
-	Crawler2.start()
+
+	Connector1.join()
+	Connector0.join()
+	Crawler0.join()
 	Crawler1.join()
-	Crawler2.join()
 	f.close()
+
 if __name__ == "__main__":
 	main()
+
+
+
